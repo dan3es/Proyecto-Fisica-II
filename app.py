@@ -26,9 +26,8 @@ def mostrar_resultado(res):
             st.latex(p["formula"])
             st.write("Sustitución: " + p["sustitucion"])
             st.success(p["resultado"])
-        if res.get("interpretacion"):
+    if res.get("interpretacion"):
         st.info("💡 " + res["interpretacion"])
-
 
 def entrada(clave, minimo=2):
     texto = st.text_area("Datos (separados por coma, espacio o salto de línea; decimales con punto)",
