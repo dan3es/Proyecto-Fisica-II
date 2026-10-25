@@ -4,18 +4,16 @@ import streamlit as st
 from utils import parsear_datos, fmt
 import descriptiva, experimental, tablas
 
-# ====== EDITAR ESTOS DATOS ======
 NOMBRE_APP = "LIDNIA"
 INTEGRANTES = ["Valery Ivonne Amaya Jorge", 
                "Darlene Josabet Santizo Carrillo"]
 ASIGNATURA = "Física II"
 SECCION = "Sección A"
-# ================================
 
-st.set_page_config(page_title=NOMBRE_APP, page_icon="📊", layout="wide")
-st.title(f"📊 {NOMBRE_APP}")
+st.set_page_config(page_title=NOMBRE_APP, page_icon="📋", layout="wide")
+st.title(f"📋 {NOMBRE_APP}")
 st.caption("Asistente virtual de Física II  |  " + " y ".join(INTEGRANTES)
-    + f"  |  {ASIGNATURA}  |  {SECCION}  |  Universidad Mariano Gálvez")
+    + f"  |  {ASIGNATURA}  |  {SECCION}  |  Universidad Mariano Gálvez de Guatemala")
 
 EJEMPLO = "2.1, 2.3, 2.2, 2.4, 2.0"
 
@@ -46,8 +44,11 @@ def cargar_modulo(nombre):
         return lambda: st.info(f"Módulo '{nombre}' aún no disponible ({e}).")
 
 
-tabs = st.tabs(["Descriptiva", "Datos experimentales", "Tablas y gráficas",
-                "Probabilidad", "Regresión", "Práctica", "Interpretación"])
+pregunta, *tabs = st.tabs(["Pregunta", "Descriptiva", "Datos experimentales", "Tablas y gráficas",
+                           "Probabilidad", "Regresión", "Práctica", "Interpretación"])
+
+with pregunta:
+    cargar_modulo("interprete")()
 
 with tabs[0]:
     datos, err = entrada("d_desc")
