@@ -74,6 +74,13 @@ def _sobrantes(t, datos, k=None):
     return " Ojo: no usé estos números: " + ", ".join(f"{x:g}" for x in restantes) + "."
 
 
+def _medidas_pedidas(t):
+    """Medidas descriptivas que menciona la frase (vacío = todas)."""
+    claves = [("Media", r"\bmedia\b|promedio"), ("Mediana", r"\bmediana\b"), ("Moda", r"\bmoda\b"),
+              ("Rango", r"\brango\b"), ("Varianza", r"varianza"), ("Desviación estándar", r"desviaci|desv\.")]
+    return [nombre for nombre, patron in claves if re.search(patron, t)]
+
+
 def _resumen_datos(datos):
     vista = ", ".join(f"{x:g}" for x in datos[:10]) + (", …" if len(datos) > 10 else "")
     return f"{len(datos)} datos ({vista})"
@@ -219,10 +226,12 @@ def interpretar(texto):
     # 7) Estadística descriptiva
     poblacional = "poblacional" in t and "muestral" not in t
     tipo = "poblacional" if poblacional else "muestral"
+    pedidas = _medidas_pedidas(t)
+    calculo = ("calcular " + ", ".join(m.lower() for m in pedidas)) if pedidas else "calcular todas las medidas"
     return {"modulo": "descriptiva",
-            "args": {"datos": datos, "poblacional": poblacional, "unidad": unidad},
-            "entendido": f"Estadística descriptiva con {_resumen_datos(datos)}{u}; desviación {tipo}."
-                + _sobrantes(t, datos)}
+            "args": {"datos": datos, "poblacional": poblacional, "unidad": unidad, "pedidas": pedidas},
+            "entendido": f"Estadística descriptiva con {_resumen_datos(datos)}{u}; {calculo} "
+                         f"(desviación {tipo})." + _sobrantes(t, datos)}
 
 
 def ejecutar(plan):
@@ -237,7 +246,9 @@ def ejecutar(plan):
     if modulo == "interpretacion":
         return "diccionario", comparar_desviaciones(**args)
     if modulo == "descriptiva":
-        return "pasos", descriptiva.analizar(**args)
+        pedidas = args.pop("pedidas", [])
+        res = descriptiva.analizar(**args)
+        return "pasos", descriptiva.filtrar(res, pedidas) if pedidas else res
     if modulo == "experimental":
         return "pasos", experimental.analizar_exp(**args)
     df, info = tablas.tabla_frecuencias(args["datos"], args.get("k"))

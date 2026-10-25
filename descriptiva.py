@@ -67,3 +67,16 @@ def analizar(datos, poblacional=False, unidad=""):
     return {"n": n, "media": media, "mediana": mediana, "moda": mo, "rango": rango,
             "varianza": var, "desv": sd, "poblacional": poblacional,
             "pasos": pasos, "interpretacion": interp}
+
+
+MEDIDAS = ["Media", "Mediana", "Moda", "Rango", "Varianza", "Desviación estándar"]
+
+
+def filtrar(res, medidas):
+    """Deja solo los pasos de las medidas pedidas (nombres de MEDIDAS)."""
+    indices = sorted(MEDIDAS.index(m) for m in medidas)
+    nuevo = dict(res)
+    nuevo["pasos"] = [res["pasos"][i] for i in indices]
+    if not ("Media" in medidas and "Desviación estándar" in medidas):
+        nuevo["interpretacion"] = ""
+    return nuevo

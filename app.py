@@ -26,7 +26,8 @@ def mostrar_resultado(res):
             st.latex(p["formula"])
             st.write("Sustitución: " + p["sustitucion"])
             st.success(p["resultado"])
-    st.info("💡 " + res["interpretacion"])
+        if res.get("interpretacion"):
+        st.info("💡 " + res["interpretacion"])
 
 
 def entrada(clave, minimo=2):
@@ -53,11 +54,15 @@ with pregunta:
 with tabs[0]:
     datos, err = entrada("d_desc")
     tipo = st.radio("Tipo de datos", ["Muestra (÷ n−1)", "Población (÷ n)"], horizontal=True)
+    pedidas = st.multiselect("Qué calcular", descriptiva.MEDIDAS, default=descriptiva.MEDIDAS)
     if st.button("Calcular", key="b_desc"):
         if err:
             st.error(err)
+        elif not pedidas:
+            st.error("Elige al menos una medida.")
         else:
-            mostrar_resultado(descriptiva.analizar(datos, poblacional=tipo.startswith("Pob")))
+            res = descriptiva.analizar(datos, poblacional=tipo.startswith("Pob"))
+            mostrar_resultado(descriptiva.filtrar(res, pedidas))
 
 with tabs[1]:
     datos, err = entrada("d_exp")

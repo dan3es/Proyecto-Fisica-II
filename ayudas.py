@@ -97,4 +97,5 @@ def mostrar_pasos(res):
             st.latex(p["formula"])
             st.write("Sustitución: " + p["sustitucion"])
             st.success(p["resultado"])
-    st.info("💡 " + res["interpretacion"])
+    if res.get("interpretacion"):
+        st.info("💡 " + res["interpretacion"])

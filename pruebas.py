@@ -5,6 +5,7 @@ import descriptiva
 import experimental
 import tablas
 from interpretacion import comparar_desviaciones
+from interprete import NoEntendido, ejecutar, interpretar
 from probabilidad import resolver_normal, resolver_probabilidad_basica
 from regresion import calcular_regresion
 from practicas import EJEMPLOS, TIPOS_PRACTICA, generar_practica, evaluar_respuesta, resolver_ejemplo
@@ -62,5 +63,26 @@ for entrada, mensaje in [(lambda: calcular_regresion([1, 2, 3], [1, 2]), "misma 
         assert mensaje in str(e)
         pruebas += 1
         print(f"OK  Aviso de error: {e}")
+
+frase = "Con mediciones de corriente (A): 2.1, 2.3, 2.2, 2.4 y 2.0; calcula media, desviación estándar muestral e interpreta."
+comprobar("Pregunta escrita: desviación muestral", ejecutar(interpretar(frase))[1]["desv"], 0.1581)
+frase = "La nota sigue una distribución normal con media 70 y desviación estándar 10. Calcula P(X < 85)."
+comprobar("Pregunta escrita: P(X < 85)", ejecutar(interpretar(frase))[1]["valores"]["p"], 0.9332)
+frase = "Correlación y regresión lineal con x = 1, 2, 3, 4, 5 e y = 2, 4, 5, 4, 5"
+comprobar("Pregunta escrita: r", ejecutar(interpretar(frase))[1]["valores"]["r"], 0.7746)
+try:
+    interpretar("hola")
+    raise AssertionError("debía avisar que no entiende")
+except NoEntendido:
+    pruebas += 1
+    print("OK  Pregunta no entendida: avisa en lugar de calcular")
+
+frase = "Con mediciones de corriente (A): 2.1, 2.3, 2.2, 2.4 y 2.0; calcula media, desviación estándar muestral e interpreta."
+res = ejecutar(interpretar(frase))[1]
+comprobar("Solo lo pedido: pasos mostrados (media y desviación)", len(res["pasos"]), 2)
+res = ejecutar(interpretar("Calcula la mediana y la moda de 12, 15, 11, 15, 18, 20, 15, 13"))[1]
+comprobar("Solo lo pedido: mediana y moda", len(res["pasos"]), 2)
+res = ejecutar(interpretar("Estadística descriptiva de: 12, 15, 11, 15, 18, 20, 15, 13"))[1]
+comprobar("Sin medidas indicadas: se muestran todas", len(res["pasos"]), 6)
 
 print(f"\nTodas las pruebas pasaron ({pruebas}).")
